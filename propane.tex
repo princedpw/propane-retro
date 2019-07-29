@@ -21,6 +21,8 @@
 
 \usepackage{balance}
 
+\usepackage{mathptmx}
+
 
 \definecolor{princetonorange}{RGB}{255,143,0}
 \definecolor{tmlblue}{RGB}{0,58,120}  % tmlblue == Toronto Maple Leafs Blue!
@@ -84,11 +86,11 @@
 
 \begin{document}
 
-\CopyrightYear{2016} 
+\CopyrightYear{2019} 
 \setcopyright{acmcopyright}
-\conferenceinfo{SIGCOMM '16,}{August 22-26, 2016, Florianopolis , Brazil}
-\isbn{978-1-4503-4193-6/16/08}\acmPrice{\$15.00}
-\doi{http://dx.doi.org/10.1145/2934872.2934909}
+\conferenceinfo{SIGCOMM}{}
+\isbn{?}
+\doi{??}
 
 
 
@@ -96,7 +98,13 @@
 %\setlength{\pdfpageheight}{\paperheight}
 %\setlength{\pdfpagewidth}{\paperwidth}
 
-\title{Don't Mind the Gap:  Bridging Network-wide Objectives and Device-level Configurations}
+\title{Don't Mind the Gap:  Bridging Network-wide Objectives and
+  Device-level Configurations}
+
+\subtitle{
+  (Brief Reflections on Abstractions
+  for Network Programming)
+  }
 
 %\author{Paper \#324, 14 pages}
 
@@ -132,18 +140,16 @@ David Walker\\
 \maketitle
 
 
-
-\textbf{Abstract---}
-We develop \sysname, a language and compiler to help network operators with a challenging, error-prone task---bridging the gap between network-wide routing objectives and low-level configurations of devices that run complex, distributed protocols.
-%
-The language allows operators to specify their objectives naturally, using
-high-level constraints on both the shape and relative preference of traffic paths.
-%
-The compiler automatically translates these specifications to router-level BGP configurations, using an effective intermediate representation that compactly encodes the flow of routing information along policy-compliant paths.
-%It uses We introduce data structures and algorithms that
-It guarantees that the compiled configurations correctly implement the specified policy under all possible combinations of failures.
-%
-We show that \sysname can effectively express the policies of datacenter and backbone networks of a large cloud provider;  and despite its strong guarantees, our compiler scales to networks with hundreds or thousands of routers.
+\noindent
+\textbf{Abstract} \\
+We reflect on the historical context that lead to the development of
+\sysname,
+a high-level language and compiler designed to help network operators
+with the task
+of bridging the gap between network-wide routing objectives and low-level configurations of devices that run complex, distributed protocols.
+We also highlight the primary contributions that Propane made to the
+networking literature and describe several of the ongoing challenges.
+We conclude with an important lesson learned from the experience.
 
 
 
@@ -168,13 +174,13 @@ $\bullet$ Software and its engineering $\rightarrow$ {\em Automated static analy
 Propane; Domain-specific Language; BGP; Synthesis; Compilation; Fault Tolerance; Distributed Systems
 
 
-\section{Outline}
+% \section{Outline}
 
-\begin{itemize}
-\item highlight the differences between openflow and
-  \item interdomain setting  difference .  same abstraction both
-    inside and outside.
-\end{itemize}
+% \begin{itemize}
+% \item highlight the differences between openflow and
+%   \item interdomain setting  difference .  same abstraction both
+%     inside and outside.
+% \end{itemize}
 
 \section{A Quick History}
 
@@ -270,39 +276,126 @@ simply work well enough from a performance perspective in many common
 cases.  Finally, regardless of whether a network uses SDN internally
 or not, it is necessary to communicate with peers, and the only
 current means of doing so is to use BGP.  Hence, interfacing with
-traditional distributed protocols remains essential, even in the SDN world.
+traditional distributed protocols remains essential, even in the SDN
+world.
 
-Unfortunately, management of traditional networks continues to be a
-challenging task.  Indeed, one regularly hears of major networks, some
-of them engineered by the most competent tech firms in the business,
-suffering outages due to changes in network misconfiguration.  We
-speculate that one reason for that may be the gap between the
-intentions of network engineers and the specifications mechanisms
-available to network operators.  On the one hand, objectives are
-phrased in terms of network-wide properties, such as reachability or
-access to servers; on the other hand the mechanisms use to implement
-those properties are device-local.
+The primary contribution of Propane is to demonstrate that the kinds
+of high-level abstractions developed to specify \emph{data plane} policy in
+software-defined networks could also be adapted and used to specify
+\emph{control plane} policy in traditional networks. In particular,
+fundamental network-wide abstractions such as paths, specified via
+regular expressions, and boolean expressions, used to
+classify traffic, could be combined, as in the SDN world, to denote
+the expected flow of data plane traffic.  However, two significant
+differences at the level of operator specifications.  First, whereas SDN
+programs concern themselves entirely with intra-domain routing,
+Propane's control-plane specifications could simultaneously specify
+both intra- and inter-domain traffic patterns.  Hence, in a single
+uniform
+notation, network engineers could specify the way they wished to
+interact with their peers and how they wanted to route traffic through
+their own network.  Second, when failures
+occur, the control plane will recompute its routing decisions and
+choose a backup route---these backups must be specified up front,
+along with the primary routes.  Propane added relations between paths
+to allow operators to specify they prefer one over the other except in
+the case a failure occurs.
 
-Familiar with the history of the development of SDN abstractions, we
-asked ourselves whether such abstractions could be used to program
-conventional routers instead of Hence, the key question we asked 
+A second key contribution of the Propane language and system is a
+demonstration that the specifications provided can be compiled
+and implemented correctly using traditional distributed protocols
+as implemented in conventional routers.  We chose to use BGP as the
+implementation protocol because of its flexibility.  However, it turned out
+that not all regular sets can be implemented by path vector protocols
+like BGP.  Consequently, we defined an analysis to inform users when
+their policies can and cannot be implemented in BGP.  The original
+SIGCOMM paper describes the analysis and compilation process rather briefly;
+Beckett's thesis~\cite{beckett:thesis}, which won the 2018 ACM SIGCOMM
+dissertation award, in part for its description of Propane, fills in further details.
 
-So the essential question we asked when beginning the
-development of Propane was whether the high-level abstractions
-developed for specifying SDN data plane routes could be used instead to
-specify control plane mechanics and whether it would be possible to
-compile such specifications to legacy devices so commodity hardware
-and software could be reused.
+% Unfortunately, management of traditional networks continues to be a
+% challenging task.  Indeed, one regularly hears of major networks, some
+% of them engineered by the most competent tech firms in the business,
+% suffering outages due to changes in network misconfiguration.  We
+% speculate that one reason for that may be the gap between the
+% intentions of network engineers and the specifications mechanisms
+% available to network operators.  On the one hand, objectives are
+% phrased in terms of network-wide properties, such as reachability or
+% access to servers; on the other hand the mechanisms use to implement
+% those properties are device-local.
+
+% Familiar with the history of the development of SDN abstractions, we
+% asked ourselves whether such abstractions could be used to program
+% conventional routers instead of Hence, the key question we asked 
+
+% So the essential question we asked when beginning the
+% development of Propane was whether the high-level abstractions
+% developed for specifying SDN data plane routes could be used instead to
+% specify control plane mechanics and whether it would be possible to
+% compile such specifications to legacy devices so commodity hardware
+% and software could be reused.
 
 \section{Continuing Challenges}
 
-While work 
+While the original work supplied a proof of concept, much work
+remained, and continues to remain, to provide the surrounding
+infrastructure necessary for Propane to be adopted industrially.
 
-\begin{itemize}
-\item scaling and incrementality.
-\item multiple protocols
-\item bridging the gap
-\end{itemize}
+\paragraph*{Scaling} One of the first continuing challenges was to improve the scaling
+properties of Propane to make it attractive to owners of large
+networks.  To tackle this problem, we stole an idea already in use in
+industry: the notion of templates.  Rather than specifying concrete
+locations and destinations, we allow specifications to include
+template variables.  In a first compilation phase, we analyze the
+Propane specification with respect to these parameters and an
+\emph{abstract topology} and ensure that any legal instantiation of
+the parameters will generate a control plane and concrete topology
+with desirable properties (\emph{e.g.}, the appropriate level of fault
+tolerance).  In a second compilation phase, we instantiate the
+parameters and convert the abstract topology to a valid concrete
+topology.  We found that this two phase compilation strategy
+dramatically improved compilation times for Propane:  Using abstract
+topologies, Propane is able to compile data center configurations up to two
+orders of magnitude more quickly.  These generated configurations are also designed to
+allow certain kinds of incremental changes to network configuration
+without recompilation and reinstallation of all configurations on all
+switches.  Beckett describes the details of incremental compilation and the scaling of
+our revised architecture in follow-on work~\cite{abstract-propane} and
+in his thesis~\cite{beckett:thesis}.
+
+\paragraph*{Incremental deployment}  The most significant roadblock to
+deploying Propane industrially remains the issue of how to deploy
+Propane incrementally.  At the moment, Propane is designed for new
+networks that have yet to be deployed; How should Propane interact
+with existing networks that currently operate using some completely different, ad
+hoc configuration system?  This is a rich problem, worthy of future
+study, and the topic of an ongoing NSF grant~\cite{nsf-propane}.
+
+One possible approach begins by attempting to analyze the set of
+low-level configuration that are currently in force in the existing
+network.  Such an analysis could identify the paths allowed and
+synthesize a Propane specification that matches.  The simplest way of
+doing so may be to list all the paths through the network one-by-one.
+However, such a listing is likely very verbose; compact specifications
+are almost always much preferred over verbose ones.  One approach to
+finding a more compact spec would be to generalize, which may involve
+admitting more paths in the specification than are present in the
+existing network.  In other words, a compact generated specification
+might over-approximate the set of actual routes.  But how much
+overapproximation will a user accept?  These and similar questions
+require more research to answer.  
+
+\paragraph*{Incremental evolution}
+Once Propane has been deployed, users will undoubtedly need to update
+their policy from time to time.  While
+Propane/AT~\cite{abstract-propane} provides mechanisms that allow for
+incremental update of the network topology, for instance, to extend a
+network with additional nodes, it does not provide mechanisms for
+changing policy.  One approach to solving this problem would be to
+adapt recent research on network repair~\cite{Gember-Jacobson:SOSP17}
+to the problem.  The idea here would be that the new Propane
+program would be the specification and the existing set of
+configurations be ``repaired'' to the point that they meet this new specification.
 
 \section{A Key Lesson:  The Importance of Small Models}
 \label{sec:conclusions}
@@ -333,7 +426,15 @@ to see the networking community develop more small models other
 components of the networking stack.
 
 \para{Acknowledgments}
-We thank R. Aditya, George Chen, and Lihua Yuan for feedback on the work and the SIGCOMM reviewers for comments on the paper. This work is supported in part by the National Science Foundation awards CNS-1161595 and CNS-1111520 as well as a gift from Cisco.
+We thank R. Aditya, George Chen, and Lihua Yuan for feedback on the
+work and the SIGCOMM reviewers for comments on the original
+paper. That work was supported in part by the National Science
+Foundation awards CNS-1161595 and CNS-1111520 as well as a gift from
+Cisco.
+
+The current paper was supported in part by the National Science
+Foundation award 1703493.  We would like to thank George Varghese for
+his thoughts on the Propane project and ideas for its evolution.
 
 
 \balance
