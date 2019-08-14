@@ -111,17 +111,17 @@
 
 \author{%
 Ryan Beckett\\
-  \affaddr{Princeton}
+  \affaddr{Microsoft}
   %\\
   %\email{rbeckett@princeton.edu}
 \and
 Ratul Mahajan\\
-  \affaddr{Microsoft}
+  \affaddr{University of Washington} and \affaddr{Intentionet}
   %\\
   %\email{ratul@microsoft.com}
 \and
 Todd Millstein\\
-  \affaddr{UCLA}
+  \affaddr{UCLA} and \affaddr{Intentionet}
   %\affaddr{University of California, Los Angeles}
   %\\
   %\email{todd@cs.ucla.edu}
@@ -132,7 +132,7 @@ Jitendra Padhye\\
   %\email{padhye@microsoft.com}
 \and
 David Walker\\
-  \affaddr{Princeton}
+  \affaddr{Princeton University}
   %\\
   %\email{dpw@princeton.edu}
 }
@@ -142,13 +142,12 @@ David Walker\\
 
 \noindent
 \textbf{Abstract} \\
-We reflect on the historical context that lead to the development of
+We reflect on the historical context that lead to 
 \sysname,
-a high-level language and compiler designed to help network operators
-with the task
-of bridging the gap between network-wide routing objectives and low-level configurations of devices that run complex, distributed protocols.
+a high-level language and compiler to help network operators
+bridge the gap between network-wide routing objectives and low-level configurations of devices that run complex, distributed protocols.
 We also highlight the primary contributions that Propane made to the
-networking literature and describe several of the ongoing challenges.
+networking literature and describe ongoing challenges.
 We conclude with an important lesson learned from the experience.
 
 
@@ -182,48 +181,47 @@ Propane; Domain-specific Language; BGP; Synthesis; Compilation; Fault Tolerance;
 %     inside and outside.
 % \end{itemize}
 
-\section{A Quick History}
+\section{Historical context}
 
-When Software-Defined Networking (SDN) burst onto the scene in 2008,
-it offered a new means to control networking hardware from a single
-centralized vantagepoint.  Neither industrial engineers nor academic
+When Software-Defined Networking (SDN) burst onto the scene around 2008,
+it offered a new means to control packet forwarding  from a single
+centralized vantage point.  Neither network engineers nor 
 researchers would be bound to the slowly-evolving technology provided by
 traditional routers.  Instead, for many in the networking
-community, SDN technology opened up the opportunity to program new
-routing algorithms that use network-wide data to optimize performance.
+community, SDN opened up the opportunity to program new
+algorithms that use network-wide data to optimize performance.
 The decisions made by these new algorithms could then be realized by
-pushing low-level packet-processing rules out to a distributed
-collection of OpenFlow-enabled switches.
+pushing specific packet-processing rules out to a distributed
+collection of  OpenFLow-enabled switches.
 
 While many networking researchers examined \emph{what} new algorithms
-could be implementing using SDN technology, a few, in collaboration
-with some programming languages folks, began to explore \emph{how}
+could be implementing using SDN, a few, in collaboration
+with programming languages researchers, began to explore \emph{how}
 best to express these algorithms.  With a plethora of new algorithms
 and much new infrastructure being developed, there are also bound to
 be many bugs, which in the short term at least, might make such network
 services less reliable.  Hence, it made sense to consider
 whether there might be new programming paradigms that, through their
 design, might be able to cut down on certain classes of software
-errors, just as Java, or other safe, garbage-collected languages cut
+errors, just as garbage-collected languages cut
 down on memory errors relative to C.
 
-The first foray into this new space involved development of the
-Frenetic language and system~\cite{frenetic}.  Frenetic responded to control
+The first foray into this new space was the Frenetic language and system~\cite{frenetic}.  It responded to control
 events from switches, such as failures or traffic statistics, and used
 the information it received to compute declarative dataplane
 policies.  These policies specified much of the same information as
-lists of OpenFlow rules, but unlike OpenFlow, they were designed to be composable.  For
+lists of OpenFlow rules, but unlike OpenFlow, they were composable.  For
 instance, one could specify a network monitoring policy separately
 from a network routing policy and then implement both policies
 simultaneously, without fear of conflicts, by invoking a single
-function.  Under the covers, the Frenetic compiler
-generated sets of OpenFlow rules and installed them
+function.  Under the covers, Frenetic 
+generated OpenFlow rules and installed them
 ``consistently''~\cite{consistent-updates} to avoid transient bad
-behaviors.  Support for composition and for consistent update
-effectively raised the level of abstraction at which
-programmers could implement policy.
+behaviors.  Composition and consistent updates
+raised the level of abstraction at which
+network engineers could implement policy.
 
-Inspired by Frenetic, researchers worked to extend the set of
+Inspired by Frenetic, researchers extended the set of
 high-level abstractions available to network engineers.  For instance,
 NetCore~\cite{netcore} generalized Frenetic's
 simple packet patterns, allowing users to classify traffic
@@ -249,69 +247,66 @@ abstraction.
 % rich equational and semantic theories for reasoning about the
 % correctness of data plane programs.
 
-To summarize, in the five-year period between 2008 and 2013,
-researchers had come to agree upon two essential elements of stateless,
+Thus, in the five-year period between 2008 and 2013,
+researchers had converged to two essential elements of stateless,
 network-wide data
 plane programming:  (1) regular expressions to describe paths and (2)
-boolean predicates to classify packets and to choose the paths along
-which to send them.  In 2014, Anderson \emph{et al.}~\cite{netkat}
+boolean predicates to classify packets and to choose the paths.  In 2014, Anderson \emph{et al.}~\cite{netkat}
 recognized that network programming languages possessing this
 combination of features were instances of a well-known algebraic
 structure called a Kleene Algebra with Tests
-(KAT)~\cite{kat}.  By identifying this connection, a rich semantic
+(KAT)~\cite{kat}.  Through this connection, a rich semantic
 theory and a host of algorithmic techniques could be adapted from the
-world of formal algebra and applied to the study of network programs.
+world of formal algebra to study network programs.
 
 \section{Propane's Contributions}
 
-While SDN was the hot topic of the day in both academia and industry,
-most networks, both big and small, continued to be implemented using
-traditional routers running conventional distributed protocols such as
+While SDN was the hot topic of the day in academia,
+most networks, both big and small, continued using
+traditional routing protocols such as
 OSPF and BGP.  Even modern data centers, which might use SDN around
-the edge, often continued to use conventional routers through their
-core.  In part, continued use of traditional routers is certainly
-simply a legacy software and hardware issue.  It is also likely that
+the edge, often continued to use traditional routing in their
+core.  In part, this continued use is certainly
+a legacy software and hardware issue.  But it is also likely that
 traditional routers, which have the benefit of being plug-and-play,
-simply work well enough from a performance perspective in many common
-cases.  Finally, regardless of whether a network uses SDN internally
-or not, it is necessary to communicate with peers, and the only
-current means of doing so is to use BGP.  Hence, interfacing with
+simply perform well enough in many common
+cases.  Finally, regardless of whether a network uses SDN internally, it is necessary to communicate with peers, and the only
+current means of doing so is via BGP.  Hence, interfacing with
 traditional distributed protocols remains essential, even in the SDN
 world.
 
 The primary contribution of Propane is to demonstrate that the kinds
-of high-level abstractions developed to specify \emph{data plane} policy in
-software-defined networks could also be adapted and used to specify
+of high-level abstractions to specify \emph{data plane} policy in SDN could also be adapted to specify
 \emph{control plane} policy in traditional networks. In particular,
 fundamental network-wide abstractions such as paths, specified via
 regular expressions, and boolean expressions, used to
 classify traffic, could be combined, as in the SDN world, to denote
-the expected flow of data plane traffic.  However, two significant
+the expected flow of data plane traffic.  
+
+However, there are two significant
 differences at the level of operator specifications.  First, whereas SDN
-programs concern themselves entirely with intra-domain routing,
-Propane's control-plane specifications could simultaneously specify
+programs concern themselves only with intra-domain routing,
+Propane could simultaneously specify
 both intra- and inter-domain traffic patterns.  Hence, in a single
 uniform
 notation, network engineers could specify the way they wished to
 interact with their peers and how they wanted to route traffic through
 their own network.  Second, when failures
-occur, the control plane will recompute its routing decisions and
+occur or a route is withdrawn by the peer, the control plane will recompute its routing decisions and
 choose a backup route---these backups must be specified up front,
 along with the primary routes.  Propane added relations between paths
-to allow operators to specify they prefer one over the other except in
-the case a failure occurs.
+to allow operators to specify path preferences such that a lower-preference path is taken only when a higher-preference path is unavailable.
 
-A second key contribution of the Propane language and system is a
-demonstration that the specifications provided can be compiled
-and implemented correctly using traditional distributed protocols
-as implemented in conventional routers.  We chose to use BGP as the
-implementation protocol because of its flexibility.  However, it turned out
-that not all regular sets can be implemented by path vector protocols
-like BGP.  Consequently, we defined an analysis to inform users when
-their policies can and cannot be implemented in BGP.  The original
-SIGCOMM paper describes the analysis and compilation process rather briefly;
+A second key contribution of the Propane is to
+demonstrate how global specifications provided can be compiled
+and implemented correctly using traditional distributed protocols.  
+It uses BGP as the
+implementation protocol because of its flexibility.  However, not all regular sets can be implemented by path vector protocols
+like BGP.  Consequently, Propane defined an analysis to inform users when
+their policies cannot be implemented in BGP.  The original
+SIGCOMM paper describes the analysis and compilation process briefly;
 Beckett's thesis~\cite{beckett:thesis}, which won the 2018 ACM SIGCOMM
-dissertation award, in part for its description of Propane, fills in further details.
+dissertation award, fills in the details.
 
 % Unfortunately, management of traditional networks continues to be a
 % challenging task.  Indeed, one regularly hears of major networks, some
@@ -339,11 +334,11 @@ dissertation award, in part for its description of Propane, fills in further det
 
 While the original work supplied a proof of concept, much work
 remained, and continues to remain, to provide the surrounding
-infrastructure necessary for Propane to be adopted industrially.
+infrastructure necessary for Propane to be adopted by mainstream network engineers.
 
-\paragraph*{Scaling} One of the first continuing challenges was to improve the scaling
-properties of Propane to make it attractive to owners of large
-networks.  To tackle this problem, we stole an idea already in use in
+\paragraph*{Scaling} One of the first challenges was to improve the scaling
+properties of Propane to make it attractive to engineers of large
+networks.  To tackle this problem, in a follow-on system called Propane/AT~\cite{abstract-propane}, we stole an idea in use in
 industry: the notion of templates.  Rather than specifying concrete
 locations and destinations, we allow specifications to include
 template variables.  In a first compilation phase, we analyze the
@@ -354,28 +349,29 @@ with desirable properties (\emph{e.g.}, the appropriate level of fault
 tolerance).  In a second compilation phase, we instantiate the
 parameters and convert the abstract topology to a valid concrete
 topology.  We found that this two phase compilation strategy
-dramatically improved compilation times for Propane:  Using abstract
-topologies, Propane is able to compile data center configurations up to two
-orders of magnitude more quickly.  These generated configurations are also designed to
+dramatically improved compilation times for Propane.  Using abstract
+topologies, Propane can compile data center configurations up to two
+orders of magnitude faster.  These generated configurations also
 allow certain kinds of incremental changes to network configuration
 without recompilation and reinstallation of all configurations on all
-switches.  Beckett describes the details of incremental compilation and the scaling of
-our revised architecture in follow-on work~\cite{abstract-propane} and
-in his thesis~\cite{beckett:thesis}.
+switches.  
+%Beckett describes the details of incremental compilation and the scaling of
+%our revised architecture in follow-on work~\cite{abstract-propane} and
+%in his thesis~\cite{beckett:thesis}.
 
-\paragraph*{Incremental deployment}  The most significant roadblock to
-deploying Propane industrially remains the issue of how to deploy
-Propane incrementally.  At the moment, Propane is designed for new
-networks that have yet to be deployed; How should Propane interact
-with existing networks that currently operate using some completely different, ad
+\paragraph*{Incremental deployment}  A big challenge to
+deploying Propane industrially is incremental deployment. 
+At the moment, Propane is designed for new
+networks. How should Propane interact
+with existing networks that operate using completely different, ad
 hoc configuration system?  This is a rich problem, worthy of future
 study, and the topic of an ongoing NSF grant~\cite{nsf-propane}.
 
-One possible approach begins by attempting to analyze the set of
-low-level configuration that are currently in force in the existing
+One possible approach is to analyze the set of
+low-level configuration that are present in the existing
 network.  Such an analysis could identify the paths allowed and
-synthesize a Propane specification that matches.  The simplest way of
-doing so may be to list all the paths through the network one-by-one.
+synthesize a matching Propane specification.  The simplest way of
+doing so may list all the paths through the network one-by-one.
 However, such a listing is likely very verbose; compact specifications
 are almost always much preferred over verbose ones.  One approach to
 finding a more compact spec would be to generalize, which may involve
@@ -383,11 +379,11 @@ admitting more paths in the specification than are present in the
 existing network.  In other words, a compact generated specification
 might over-approximate the set of actual routes.  But how much
 overapproximation will a user accept?  These and similar questions
-require more research to answer.  
+require further research.  
 
 \paragraph*{Incremental evolution}
-Once Propane has been deployed, users will undoubtedly need to update
-their policy from time to time.  While
+Once Propane is deployed, engineers will undoubtedly need to update
+policy from time to time.  While
 Propane/AT~\cite{abstract-propane} provides mechanisms that allow for
 incremental update of the network topology, for instance, to extend a
 network with additional routers, it does not provide mechanisms for
@@ -395,30 +391,29 @@ changing policy.  One approach to solving this problem would be to
 adapt recent research on network repair~\cite{Gember-Jacobson:SOSP17}
 to the problem.  The idea here would be that the new Propane
 program would be the specification and the existing set of
-configurations be ``repaired'' to the point that they meet this new specification.
+configurations be ``repaired'' to meet this new specification.
 
 \section{A Key Lesson:  The Importance of Small Models}
 \label{sec:conclusions}
 
 The programming languages that software engineers use on a day-to-day
 basis are extremely complicated.  This is true of C++, Python, Haskell, and
-JavaScript and it is also true of Cisco IOS.  In order to understand
+JavaScript, and it is also true of Cisco IOS and Juniper JunOS.  In order to understand
 how these languages work in a deep sense, how to program with them,
 and how to build reliable abstractions on top of them, one cannot
 tackle the whole language all at once.  It is necessary to build
 small, simple models first---little idealized languages---which might
 not have every bell and whistle, but that are more uniform than their
 real-world counterparts.  Such
-small models will almost always leave out essential elements of the
-real language, which will invariably frustrate current practioners.
+small models will almost always leave out elements of the
+real language, which will invariably frustrate practitioners.
 However, that is
-not a bug though, it is a feature---it frees the researcher to focus on
-what is \emph{left in} the small model and to ignore the complexity left out.
+not a bug  but a feature---it frees the researcher to focus on
+what is \emph{left in} the small model and to ignore additional complexity.
 
-In a sense, OpenFlow 1.0 was a small model for the world of
-switchware.  It provided an understanding of the network dataplane so
+In a sense, OpenFlow 1.0 was a small model for packet forwarding.  It provided an understanding of the network dataplane so
 simple that even programming language researchers could understand it!
-Once they did, they could begin to manipulate, transform, extend and
+Once they did, they could manipulate, transform, extend and
 finally apply the lessons learned to more expansive settings.  The
 latter step is where Propane comes in as it adopted the ideas to the
 more complex world of the traditional router.  Going forward, we hope
@@ -426,15 +421,14 @@ to see the networking community develop more small models other
 components of the networking stack.
 
 \para{Acknowledgments}
-We thank R. Aditya, George Chen, and Lihua Yuan for feedback on the
-work and the SIGCOMM reviewers for comments on the original
-paper. That work was supported in part by the National Science
+We thank R. Aditya, George Chen,  Lihua Yuan, and the SIGCOMM reviewers for feedback on the original
+work. That work was supported in part by the National Science
 Foundation awards CNS-1161595 and CNS-1111520 as well as a gift from
 Cisco.
 
-The current paper was supported in part by the National Science
-Foundation award 1703493.  We would like to thank George Varghese for
-his thoughts on the Propane project and ideas for its evolution.
+The current paper is supported in part by the National Science
+Foundation award 1703493.  We thank George Varghese for
+thoughts on Propane and ideas for its evolution.
 
 
 \balance
