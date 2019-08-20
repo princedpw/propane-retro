@@ -192,7 +192,7 @@ community, SDN opened up the opportunity to program new
 algorithms that use network-wide data to optimize performance.
 The decisions made by these new algorithms could then be realized by
 pushing specific packet-processing rules out to a distributed
-collection of  OpenFLow-enabled switches.
+collection of  OpenFlow-enabled switches.
 
 While many networking researchers examined \emph{what} new algorithms
 could be implementing using SDN, a few, in collaboration
@@ -208,7 +208,7 @@ down on memory errors relative to C.
 
 The first foray into this new space was the Frenetic language and system~\cite{frenetic}.  It responded to control
 events from switches, such as failures or traffic statistics, and used
-the information it received to compute declarative dataplane
+the information it received to compute declarative data plane
 policies.  These policies specified much of the same information as
 lists of OpenFlow rules, but unlike OpenFlow, they were composable.  For
 instance, one could specify a network monitoring policy separately
@@ -248,7 +248,7 @@ abstraction.
 % correctness of data plane programs.
 
 Thus, in the five-year period between 2008 and 2013,
-researchers had converged to two essential elements of stateless,
+researchers had converged on two essential elements of stateless,
 network-wide data
 plane programming:  (1) regular expressions to describe paths and (2)
 boolean predicates to classify packets and to choose the paths.  In 2014, Anderson \emph{et al.}~\cite{netkat}
@@ -270,13 +270,14 @@ core.  In part, this continued use is certainly
 a legacy software and hardware issue.  But it is also likely that
 traditional routers, which have the benefit of being plug-and-play,
 simply perform well enough in many common
-cases.  Finally, regardless of whether a network uses SDN internally, it is necessary to communicate with peers, and the only
+cases.  Finally, regardless of whether a network uses SDN internally
+or not, it is necessary to communicate with peers, and the only
 current means of doing so is via BGP.  Hence, interfacing with
 traditional distributed protocols remains essential, even in the SDN
 world.
 
 The primary contribution of Propane is to demonstrate that the kinds
-of high-level abstractions to specify \emph{data plane} policy in SDN could also be adapted to specify
+of high-level abstractions used to specify \emph{data plane} policy in SDN could also be adapted to specify
 \emph{control plane} policy in traditional networks. In particular,
 fundamental network-wide abstractions such as paths, specified via
 regular expressions, and boolean expressions, used to
@@ -300,8 +301,9 @@ to allow operators to specify path preferences such that a lower-preference path
 A second key contribution of the Propane is to
 demonstrate how global specifications provided can be compiled
 and implemented correctly using traditional distributed protocols.  
-It uses BGP as the
-implementation protocol because of its flexibility.  However, not all regular sets can be implemented by path vector protocols
+To do so, the Propane system uses BGP as the
+implementation protocol because of its flexibility.  However,
+it turns out that not all regular sets can be implemented by path vector protocols
 like BGP.  Consequently, Propane defined an analysis to inform users when
 their policies cannot be implemented in BGP.  The original
 SIGCOMM paper describes the analysis and compilation process briefly;
@@ -348,7 +350,7 @@ the parameters will generate a control plane and concrete topology
 with desirable properties (\emph{e.g.}, the appropriate level of fault
 tolerance).  In a second compilation phase, we instantiate the
 parameters and convert the abstract topology to a valid concrete
-topology.  We found that this two phase compilation strategy
+topology.  We found that this two-phase compilation strategy
 dramatically improved compilation times for Propane.  Using abstract
 topologies, Propane can compile data center configurations up to two
 orders of magnitude faster.  These generated configurations also
@@ -359,7 +361,7 @@ switches.
 %our revised architecture in follow-on work~\cite{abstract-propane} and
 %in his thesis~\cite{beckett:thesis}.
 
-\paragraph*{Incremental deployment}  A big challenge to
+\paragraph*{Incremental deployment}  A big challenge in
 deploying Propane industrially is incremental deployment. 
 At the moment, Propane is designed for new
 networks. How should Propane interact
@@ -368,7 +370,7 @@ hoc configuration system?  This is a rich problem, worthy of future
 study, and the topic of an ongoing NSF grant~\cite{nsf-propane}.
 
 One possible approach is to analyze the set of
-low-level configuration that are present in the existing
+low-level configurations that are present in the existing
 network.  Such an analysis could identify the paths allowed and
 synthesize a matching Propane specification.  The simplest way of
 doing so may list all the paths through the network one-by-one.
@@ -409,7 +411,8 @@ small models will almost always leave out elements of the
 real language, which will invariably frustrate practitioners.
 However, that is
 not a bug  but a feature---it frees the researcher to focus on
-what is \emph{left in} the small model and to ignore additional complexity.
+what is \emph{left in} the small model and to ignore additional
+complexity that is \emph{left out}.
 
 In a sense, OpenFlow 1.0 was a small model for packet forwarding.  It provided an understanding of the network dataplane so
 simple that even programming language researchers could understand it!
@@ -417,7 +420,7 @@ Once they did, they could manipulate, transform, extend and
 finally apply the lessons learned to more expansive settings.  The
 latter step is where Propane comes in as it adopted the ideas to the
 more complex world of the traditional router.  Going forward, we hope
-to see the networking community develop more small models other
+to see the networking community develop more small models for other
 components of the networking stack.
 
 \para{Acknowledgments}
@@ -427,8 +430,8 @@ Foundation awards CNS-1161595 and CNS-1111520 as well as a gift from
 Cisco.
 
 The current paper is supported in part by the National Science
-Foundation award 1703493.  We thank George Varghese for
-thoughts on Propane and ideas for its evolution.
+Foundation award 1703493.  We thank Jennifer Rexford and George Varghese for
+many discussions about Propane over the years and for ideas concerning its evolution.
 
 
 \balance
