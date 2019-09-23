@@ -1,6 +1,16 @@
 %\documentclass{sig-alternate-10pt}
 \documentclass[10pt]{sigalternate052015}
 
+\usepackage{fancyhdr}
+\fancypagestyle{plain}{%
+   \fancyhf{} %
+   \renewcommand{\headrulewidth}{0pt}%
+   \fancyfoot[L]{ACM SIGCOMM Computer Communication Review }%
+   \fancyfoot[R]{Volume 49 Issue 5, October 2019}%
+}
+\pagestyle{plain}
+\def\refname{}
+
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{xcolor}
@@ -88,9 +98,9 @@
 
 \CopyrightYear{2019} 
 \setcopyright{acmcopyright}
-\conferenceinfo{SIGCOMM}{}
-\isbn{?}
-\doi{??}
+\conferenceinfo{CCR}{}
+%\isbn{?}
+%\doi{??}
 
 
 
@@ -112,29 +122,37 @@
 \author{%
 Ryan Beckett\\
   \affaddr{Microsoft}
-  %\\
-  %\email{rbeckett@princeton.edu}
+  \\
+  \email{Ryan.Beckett@microsoft.com}
 \and
 Ratul Mahajan\\
   \affaddr{University of Washington} and \affaddr{Intentionet}
-  %\\
-  %\email{ratul@microsoft.com}
+  \\
+  \email{ratul@cs.washington.edu}
 \and
 Todd Millstein\\
   \affaddr{UCLA} and \affaddr{Intentionet}
-  %\affaddr{University of California, Los Angeles}
-  %\\
-  %\email{todd@cs.ucla.edu}
+  \\
+  \email{todd@cs.ucla.edu}
 \and
 Jitendra Padhye\\
   \affaddr{Microsoft}
-  %\\
-  %\email{padhye@microsoft.com}
+  \\
+  \email{padhye@microsoft.com}
 \and
 David Walker\\
   \affaddr{Princeton University}
-  %\\
-  %\email{dpw@princeton.edu}
+  \\
+  \email{dpw@cs.princeton.edu}
+\and
+{
+  \begin{tabular}{c}
+      \vspace{0.1in} \\
+{\normalsize This article is an editorial note submitted to CCR. It has NOT been peer reviewed.}\\
+{\normalsize The authors take full responsibility for this article's
+technical content. Comments can be posted through CCR Online.}
+\end{tabular}
+}
 }
 
 \maketitle
@@ -198,15 +216,15 @@ While many networking researchers examined \emph{what} new algorithms
 could be implementing using SDN, a few, in collaboration
 with programming languages researchers, began to explore \emph{how}
 best to express these algorithms.  With a plethora of new algorithms
-and much new infrastructure being developed, there are also bound to
+and much new infrastructure being developed, there are were bound to
 be many bugs, which in the short term at least, might make such network
 services less reliable.  Hence, it made sense to consider
 whether there might be new programming paradigms that, through their
 design, might be able to cut down on certain classes of software
-errors, just as garbage-collected languages cut
-down on memory errors relative to C.
+errors.
 
-The first foray into this new space was the Frenetic language and system~\cite{frenetic}.  It responded to control
+Frenetic was the first language that provided programmers with
+a higher-level interface to OpenFlow switches~\cite{frenetic}.  It responded to control
 events from switches, such as failures or traffic statistics, and used
 the information it received to compute declarative data plane
 policies.  These policies specified much of the same information as
@@ -219,10 +237,13 @@ generated OpenFlow rules and installed them
 ``consistently''~\cite{consistent-updates} to avoid transient bad
 behaviors.  Composition and consistent updates
 raised the level of abstraction at which
-network engineers could implement policy.
+network engineers could implement policy and helped fend off some of
+the errors that can arise due to poorly-synchronized rule installation.
 
-Inspired by Frenetic, researchers extended the set of
-high-level abstractions available to network engineers.  For instance,
+Soon afterwards, inspired by Frenetic, researchers looked to extend the set of
+policies network engineers could craft to specify intended routing
+behavior.
+For instance,
 NetCore~\cite{netcore} generalized Frenetic's
 simple packet patterns, allowing users to classify traffic
 using more general boolean predicates over packets, and demonstrated
@@ -257,7 +278,7 @@ combination of features were instances of a well-known algebraic
 structure called a Kleene Algebra with Tests
 (KAT)~\cite{kat}.  Through this connection, a rich semantic
 theory and a host of algorithmic techniques could be adapted from the
-world of formal algebra to study network programs.
+world of formal algebra to the study of network programs.
 
 \section{Propane's Contributions}
 
@@ -342,7 +363,7 @@ infrastructure necessary for Propane to be adopted by mainstream network enginee
 properties of Propane to make it attractive to engineers of large
 networks.  To tackle this problem, in a follow-on system called Propane/AT~\cite{abstract-propane}, we stole an idea in use in
 industry: the notion of templates.  Rather than specifying concrete
-locations and destinations, we allow specifications to include
+locations and destinations, we allow Propane-like specifications to include
 template variables.  In a first compilation phase, we analyze the
 Propane specification with respect to these parameters and an
 \emph{abstract topology} and ensure that any legal instantiation of
@@ -361,7 +382,7 @@ switches.
 %our revised architecture in follow-on work~\cite{abstract-propane} and
 %in his thesis~\cite{beckett:thesis}.
 
-\paragraph*{Incremental deployment}  A big challenge in
+\paragraph*{Incremental deployment}  A significant challenge in
 deploying Propane industrially is incremental deployment. 
 At the moment, Propane is designed for new
 networks. How should Propane interact
@@ -374,13 +395,15 @@ low-level configurations that are present in the existing
 network.  Such an analysis could identify the paths allowed and
 synthesize a matching Propane specification.  The simplest way of
 doing so may list all the paths through the network one-by-one.
-However, such a listing is likely very verbose; compact specifications
-are almost always much preferred over verbose ones.  One approach to
-finding a more compact spec would be to generalize, which may involve
+However, such a listing is likely very verbose and compact specifications
+are almost always much preferred over verbose ones.  Another approach to
+finding a specification would be to try to find a compact
+generalization of the naive list of paths.  However, doing so might involve
 admitting more paths in the specification than are present in the
 existing network.  In other words, a compact generated specification
 might over-approximate the set of actual routes.  But how much
-overapproximation will a user accept?  These and similar questions
+overapproximation will a user accept?  What notation should one use
+to cut out overapproximations?  These and similar questions
 require further research.  
 
 \paragraph*{Incremental evolution}
@@ -394,13 +417,16 @@ adapt recent research on network repair~\cite{Gember-Jacobson:SOSP17}
 to the problem.  The idea here would be that the new Propane
 program would be the specification and the existing set of
 configurations be ``repaired'' to meet this new specification.
+Ideally, such repairs would generate a minimal set of commands that
+could be issued to update routers.
 
 \section{A Key Lesson:  The Importance of Small Models}
 \label{sec:conclusions}
 
 The programming languages that software engineers use on a day-to-day
 basis are extremely complicated.  This is true of C++, Python, Haskell, and
-JavaScript, and it is also true of Cisco IOS and Juniper JunOS.  In order to understand
+JavaScript.  It is also true of Cisco IOS and Juniper JunOS, the
+languages network operators use to program their networks.  In order to understand
 how these languages work in a deep sense, how to program with them,
 and how to build reliable abstractions on top of them, one cannot
 tackle the whole language all at once.  It is necessary to build
@@ -414,12 +440,16 @@ not a bug  but a feature---it frees the researcher to focus on
 what is \emph{left in} the small model and to ignore additional
 complexity that is \emph{left out}.
 
-In a sense, OpenFlow 1.0 was a small model for packet forwarding.  It provided an understanding of the network dataplane so
+In a sense, OpenFlow 1.0 was a small model for packet forwarding.  It
+provided an understanding of the network dataplane so
 simple that even programming language researchers could understand it!
-Once they did, they could manipulate, transform, extend and
-finally apply the lessons learned to more expansive settings.  The
-latter step is where Propane comes in as it adopted the ideas to the
-more complex world of the traditional router.  Going forward, we hope
+Once we understood this simple forwarding model,
+we could manipulate, transform, abstract, and extend it. And then, finally,
+we could begin to apply the lessons learned in this simple setting to
+more expansive contexts.  The
+latter step is where Propane comes in as it adapted ideas developed in
+the world of early SDN dataplane to the
+more complex setting of the traditional router.  Going forward, we hope
 to see the networking community develop more small models for other
 components of the networking stack.
 
