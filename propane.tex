@@ -1,15 +1,39 @@
-%\documentclass{sig-alternate-10pt}
-\documentclass[10pt]{sigalternate052015}
+\documentclass[sigconf]{acmart}
 
+% Disable / remove copyright boxes
+\setcopyright{none}
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+
+% Increase margin between text and footer
+\setlength{\footskip}{20pt}
+
+% Add CCR footer
 \usepackage{fancyhdr}
 \fancypagestyle{plain}{%
    \fancyhf{} %
-   \renewcommand{\headrulewidth}{0pt}%
-   \fancyfoot[L]{ACM SIGCOMM Computer Communication Review }%
+   \fancyfoot[L]{ACM SIGCOMM Computer Communication Review}%
    \fancyfoot[R]{Volume 49 Issue 5, October 2019}%
 }
 \pagestyle{plain}
-\def\refname{}
+
+% Add CCR footer on first page
+\fancypagestyle{firstpagestyle}{%
+   \fancyhf{} %
+   \fancyfoot[L]{ACM SIGCOMM Computer Communication Review}%
+   \fancyfoot[R]{Volume 49 Issue 5, October 2019}%
+}
+
+% Add editorial note
+\begin{teaserfigure}
+	\parbox{\textwidth}{\centering\normalsize
+		This article is an editorial note submitted to CCR. It has NOT been peer reviewed.\\
+		The authors take full responsibility for this article's
+		technical content. Comments can be posted through CCR Online.
+	}
+	\vspace{10pt}
+\end{teaserfigure}
+
 
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -32,6 +56,12 @@
 \usepackage{balance}
 
 \usepackage{mathptmx}
+
+
+% fix from https://latex.org/forum/viewtopic.php?t=27680
+\newcommand*{\origrightarrow}{}
+\let\oldarrow\textrightarrow
+\renewcommand*{\textrightarrow}{\fontfamily{cmr}\selectfont\origrightarrow}
 
 
 \definecolor{princetonorange}{RGB}{255,143,0}
@@ -96,13 +126,6 @@
 
 \begin{document}
 
-\CopyrightYear{2019} 
-\setcopyright{acmcopyright}
-\conferenceinfo{CCR}{}
-%\isbn{?}
-%\doi{??}
-
-
 
 %\special{papersize=8.5in,11in}
 %\setlength{\pdfpageheight}{\paperheight}
@@ -119,47 +142,26 @@
 %\author{Paper \#324, 14 pages}
 
 
-\author{%
-Ryan Beckett\\
-  \affaddr{Microsoft}
-  \\
-  \email{Ryan.Beckett@microsoft.com}
-\and
-Ratul Mahajan\\
-  \affaddr{University of Washington} and \affaddr{Intentionet}
-  \\
-  \email{ratul@cs.washington.edu}
-\and
-Todd Millstein\\
-  \affaddr{UCLA} and \affaddr{Intentionet}
-  \\
-  \email{todd@cs.ucla.edu}
-\and
-Jitendra Padhye\\
-  \affaddr{Microsoft}
-  \\
-  \email{padhye@microsoft.com}
-\and
-David Walker\\
-  \affaddr{Princeton University}
-  \\
-  \email{dpw@cs.princeton.edu}
-\and
-{
-  \begin{tabular}{c}
-      \vspace{0.1in} \\
-{\normalsize This article is an editorial note submitted to CCR. It has NOT been peer reviewed.}\\
-{\normalsize The authors take full responsibility for this article's
-technical content. Comments can be posted through CCR Online.}
-\end{tabular}
-}
-}
+\author{Ryan Beckett}
+\affiliation{\institution{Microsoft}}
+\email{Ryan.Beckett@microsoft.com}
 
-\maketitle
+\author{Ratul Mahajan}
+\affiliation{\institution{University of Washington} and \institution{Intentionet}}
+\email{ratul@cs.washington.edu}
 
+\author{Todd Millstein}
+  \affiliation{\institution{UCLA} and \institution{Intentionet}}
+\email{todd@cs.ucla.edu}
 
-\noindent
-\textbf{Abstract} \\
+\author{Jitendra Padhye}
+\affiliation{\institution{Microsoft}}
+\email{padhye@microsoft.com}
+\author{David Walker}
+\affiliation{\institution{Princeton University}}
+\email{dpw@cs.princeton.edu}
+
+\begin{abstract}
 We reflect on the historical context that lead to 
 \sysname,
 a high-level language and compiler to help network operators
@@ -167,30 +169,61 @@ bridge the gap between network-wide routing objectives and low-level configurati
 We also highlight the primary contributions that Propane made to the
 networking literature and describe ongoing challenges.
 We conclude with an important lesson learned from the experience.
+\end{abstract}
 
+%\textbf{CCS Concepts}\\
+%$\bullet$ Networks $\rightarrow$ {\em Network control algorithms; Network relia%bility; Network management;} 
+%\bullet$ Software and its engineering $\rightarrow$ {\em Automated static analy%sis; Domain specific languages}
 
+\keywords{Propane; Domain-specific Language, BGP, Synthesis, Compilation, Fault Tolerance, Distributed Systems}
 
-%=====================================================
-%
-%
-%  **Keywords**
-%
-%
-%=====================================================
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10003033</concept_id>
+<concept_desc>Networks</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10003033.10003068.10003073.10003075</concept_id>
+<concept_desc>Networks~Network control algorithms</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10003033.10003083.10003095</concept_id>
+<concept_desc>Networks~Network reliability</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10003033.10003099.10003104</concept_id>
+<concept_desc>Networks~Network management</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10011007</concept_id>
+<concept_desc>Software and its engineering</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10011007.10010940.10010992.10010998.10011000</concept_id>
+<concept_desc>Software and its engineering~Automated static analysis</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10011007.10011006.10011050.10011017</concept_id>
+<concept_desc>Software and its engineering~Domain specific languages</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
 
-
-\vspace{0.1in}
-\noindent
-\textbf{CCS Concepts}\\
-$\bullet$ Networks $\rightarrow$ {\em Network control algorithms; Network reliability; Network management;} 
-$\bullet$ Software and its engineering $\rightarrow$ {\em Automated static analysis; Domain specific languages}
-
-\vspace{0.1in}
-\noindent
-\textbf{Keywords}\\
-Propane; Domain-specific Language; BGP; Synthesis; Compilation; Fault Tolerance; Distributed Systems
-
-
+\ccsdesc[500]{Networks}
+\ccsdesc[500]{Networks~Network control algorithms}
+\ccsdesc[500]{Networks~Network reliability}
+\ccsdesc[500]{Networks~Network management}
+\ccsdesc[500]{Software and its engineering}
+\ccsdesc[500]{Software and its engineering~Automated static analysis}
+\ccsdesc[500]{Software and its engineering~Domain specific languages}
 % \section{Outline}
 
 % \begin{itemize}
@@ -198,6 +231,11 @@ Propane; Domain-specific Language; BGP; Synthesis; Compilation; Fault Tolerance;
 %   \item interdomain setting  difference .  same abstraction both
 %     inside and outside.
 % \end{itemize}
+
+\maketitle
+
+
+
 
 \section{Historical context}
 
@@ -408,10 +446,10 @@ require further research.
 
 \paragraph*{Incremental evolution}
 Once Propane is deployed, engineers will undoubtedly need to update
-policy from time to time.  While
+policy from time to time to addess security vulnerabilities, add or
+remove hosts, expand capacity, or change routing decisions.  While
 Propane/AT~\cite{abstract-propane} provides mechanisms that allow for
-incremental update of the network topology, for instance, to extend a
-network with additional routers, it does not provide mechanisms for
+incremental update of the network topology, it does not provide mechanisms for
 changing policy.  One approach to solving this problem would be to
 adapt recent research on network repair~\cite{Gember-Jacobson:SOSP17}
 to the problem.  The idea here would be that the new Propane
